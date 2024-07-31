@@ -19,13 +19,14 @@ public class ProducerDemo {
         Properties properties = new Properties();
 
         // connect to Localhost
-//        properties.setProperty("bootstrap.servers", "127.0.0.1:9092");
+        // properties.setProperty("bootstrap.servers", "127.0.0.1:9092");
 
         // connect to Conduktor Playground
-        properties.setProperty("bootstrap.servers", "cluster.playground.cdkt.io:9092");
+        properties.setProperty("bootstrap.servers", "https://magnetic-finch-6283-us1-kafka.upstash.io:9092");
         properties.setProperty("security.protocol", "SASL_SSL");
-        properties.setProperty("sasl.jaas.config", "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"your-username\" password=\"your-password\";");
-        properties.setProperty("sasl.mechanism", "PLAIN");
+        properties.setProperty("sasl.jaas.config",
+                "org.apache.kafka.common.security.scram.ScramLoginModule required username=\"username\" password=\"password\";");
+        properties.setProperty("sasl.mechanism", "SCRAM-SHA-256");
 
         // set producer properties
         properties.setProperty("key.serializer", StringSerializer.class.getName());
@@ -35,8 +36,7 @@ public class ProducerDemo {
         KafkaProducer<String, String> producer = new KafkaProducer<>(properties);
 
         // create a Producer Record
-        ProducerRecord<String, String> producerRecord =
-                new ProducerRecord<>("demo_java", "hello world");
+        ProducerRecord<String, String> producerRecord = new ProducerRecord<>("demo_java", "hello world");
 
         // send data
         producer.send(producerRecord);
