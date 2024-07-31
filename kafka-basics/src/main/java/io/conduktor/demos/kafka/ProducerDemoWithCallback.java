@@ -24,10 +24,11 @@ public class ProducerDemoWithCallback {
 //        properties.setProperty("bootstrap.servers", "127.0.0.1:9092");
 
         // connect to Conduktor Playground
-        properties.setProperty("bootstrap.servers", "cluster.playground.cdkt.io:9092");
+        properties.setProperty("bootstrap.servers", "https://magnetic-finch-6283-us1-kafka.upstash.io:9092");
         properties.setProperty("security.protocol", "SASL_SSL");
-        properties.setProperty("sasl.jaas.config", "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"your-username\" password=\"your-password\";");
-        properties.setProperty("sasl.mechanism", "PLAIN");
+        properties.setProperty("sasl.jaas.config",
+                "org.apache.kafka.common.security.scram.ScramLoginModule required username=\"bWFnbmV0aWMtZmluY2gtNjI4MySfSq0Zf46fRByTfelaaxz7I9v8ZL8atkb41sI\" password=\"MmE3YTBmMjQtMGVlOS00ZjljLWE4NzgtNGI4MmMzNmRjMTFm\";");
+        properties.setProperty("sasl.mechanism", "SCRAM-SHA-256");
 
         // set producer properties
         properties.setProperty("key.serializer", StringSerializer.class.getName());
@@ -43,7 +44,7 @@ public class ProducerDemoWithCallback {
 
         for (int j=0; j<10; j++){
 
-            for (int i=0; i<30; i++){
+            for (int i=0; i<2; i++){
 
                 // create a Producer Record
                 ProducerRecord<String, String> producerRecord =
@@ -75,6 +76,7 @@ public class ProducerDemoWithCallback {
             }
 
         }
+        
 
 
         // tell the producer to send all data and block until done -- synchronous
