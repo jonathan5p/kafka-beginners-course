@@ -26,11 +26,16 @@ public class WikimediaChangesProducer {
         // set producer properties
         properties.setProperty("key.serializer", StringSerializer.class.getName());
         properties.setProperty("value.serializer", StringSerializer.class.getName());
-        
+
+        // Performance improvements
+        properties.setProperty(ProducerConfig.COMPRESSION_TYPE_CONFIG, "snappy");
+        properties.setProperty(ProducerConfig.LINGER_MS_CONFIG, "20");
+        properties.setProperty(ProducerConfig.BATCH_SIZE_CONFIG, Integer.toString(32*1024));
+
         // create the Producer
         KafkaProducer<String, String> producer = new KafkaProducer<>(properties);
 
-        String topic = "wikimedia.recentchange";
+        String topic = "wikimedia_project";
 
         EventHandler eventHandler = new WikimediaChangeHandler(producer, topic);
         String url = "https://stream.wikimedia.org/v2/stream/recentchange";
@@ -42,7 +47,7 @@ public class WikimediaChangesProducer {
         eventSource.start();
 
         // we produce for 10 minutes and block the program until then
-        TimeUnit.MINUTES.sleep(10);
+        TimeUnit.SECONDS.sleep(60);
 
 
     }

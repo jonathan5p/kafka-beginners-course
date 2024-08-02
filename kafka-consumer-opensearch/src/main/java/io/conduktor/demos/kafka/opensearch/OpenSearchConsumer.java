@@ -1,4 +1,4 @@
-package opensearch;
+package io.conduktor.demos.kafka.opensearch;
 
 import com.google.gson.JsonParser;
 import org.apache.http.HttpHost;
@@ -15,6 +15,7 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.config.SaslConfigs;
 import org.apache.kafka.common.errors.WakeupException;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.apache.kafka.common.serialization.StringSerializer;
 import org.opensearch.action.bulk.BulkRequest;
 import org.opensearch.action.bulk.BulkResponse;
 import org.opensearch.action.index.IndexRequest;
@@ -74,7 +75,12 @@ public class OpenSearchConsumer {
 
         // create consumer configs
         Properties properties = new Properties();
-        properties.setProperty(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, "127.0.0.1:9092");
+                properties.setProperty("bootstrap.servers", "https://magnetic-finch-6283-us1-kafka.upstash.io:9092");
+        properties.setProperty("security.protocol", "SASL_SSL");
+        properties.setProperty("sasl.jaas.config",
+                "org.apache.kafka.common.security.scram.ScramLoginModule required username=\"bWFnbmV0aWMtZmluY2gtNjI4MySfSq0Zf46fRByTfelaaxz7I9v8ZL8atkb41sI\" password=\"MmE3YTBmMjQtMGVlOS00ZjljLWE4NzgtNGI4MmMzNmRjMTFm\";");
+        properties.setProperty("sasl.mechanism", "SCRAM-SHA-256");
+
         properties.setProperty(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         properties.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         properties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, groupId);
