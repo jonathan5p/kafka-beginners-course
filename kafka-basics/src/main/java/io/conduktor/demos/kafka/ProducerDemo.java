@@ -25,7 +25,7 @@ public class ProducerDemo {
         properties.setProperty("bootstrap.servers", "https://magnetic-finch-6283-us1-kafka.upstash.io:9092");
         properties.setProperty("security.protocol", "SASL_SSL");
         properties.setProperty("sasl.jaas.config",
-                "org.apache.kafka.common.security.scram.ScramLoginModule required username=\"username\" password=\"password\";");
+                "org.apache.kafka.common.security.scram.ScramLoginModule required username=\"bWFnbmV0aWMtZmluY2gtNjI4MySfSq0Zf46fRByTfelaaxz7I9v8ZL8atkb41sI\" password=\"MmE3YTBmMjQtMGVlOS00ZjljLWE4NzgtNGI4MmMzNmRjMTFm\";");
         properties.setProperty("sasl.mechanism", "SCRAM-SHA-256");
 
         // set producer properties
