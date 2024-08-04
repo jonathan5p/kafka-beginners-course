@@ -38,7 +38,6 @@ public class OpenSearchConsumer {
 
     public static RestHighLevelClient createOpenSearchClient() {
         String connString = "http://localhost:9200";
-//        String connString = "https://c9p5mwld41:45zeygn9hy@kafka-course-2322630105.eu-west-1.bonsaisearch.net:443";
 
         // we build a URI from the connection string
         RestHighLevelClient restHighLevelClient;
@@ -48,7 +47,8 @@ public class OpenSearchConsumer {
 
         if (userInfo == null) {
             // REST client without security
-            restHighLevelClient = new RestHighLevelClient(RestClient.builder(new HttpHost(connUri.getHost(), connUri.getPort(), "http")));
+            restHighLevelClient = new RestHighLevelClient(
+                    RestClient.builder(new HttpHost(connUri.getHost(), connUri.getPort(), "http")));
 
         } else {
             // REST client with security
@@ -63,19 +63,18 @@ public class OpenSearchConsumer {
                                     httpAsyncClientBuilder -> httpAsyncClientBuilder.setDefaultCredentialsProvider(cp)
                                             .setKeepAliveStrategy(new DefaultConnectionKeepAliveStrategy())));
 
-
         }
 
         return restHighLevelClient;
     }
 
-    private static KafkaConsumer<String, String> createKafkaConsumer(){
+    private static KafkaConsumer<String, String> createKafkaConsumer() {
 
         String groupId = "consumer-opensearch-demo";
 
         // create consumer configs
         Properties properties = new Properties();
-                properties.setProperty("bootstrap.servers", "https://magnetic-finch-6283-us1-kafka.upstash.io:9092");
+        properties.setProperty("bootstrap.servers", "https://magnetic-finch-6283-us1-kafka.upstash.io:9092");
         properties.setProperty("security.protocol", "SASL_SSL");
         properties.setProperty("sasl.jaas.config",
                 "org.apache.kafka.common.security.scram.ScramLoginModule required username=\"bWFnbmV0aWMtZmluY2gtNjI4MySfSq0Zf46fRByTfelaaxz7I9v8ZL8atkb41sI\" password=\"MmE3YTBmMjQtMGVlOS00ZjljLWE4NzgtNGI4MmMzNmRjMTFm\";");
@@ -92,7 +91,7 @@ public class OpenSearchConsumer {
 
     }
 
-    private static String extractId(String json){
+    private static String extractId(String json) {
         // gson library
         return JsonParser.parseString(json)
                 .getAsJsonObject()
@@ -132,11 +131,12 @@ public class OpenSearchConsumer {
 
         // we need to create the index on OpenSearch if it doesn't exist already
 
-        try(openSearchClient; consumer){
+        try (openSearchClient; consumer) {
 
-            boolean indexExists = openSearchClient.indices().exists(new GetIndexRequest("wikimedia"), RequestOptions.DEFAULT);
+            boolean indexExists = openSearchClient.indices().exists(new GetIndexRequest("wikimedia"),
+                    RequestOptions.DEFAULT);
 
-            if (!indexExists){
+            if (!indexExists) {
                 CreateIndexRequest createIndexRequest = new CreateIndexRequest("wikimedia");
                 openSearchClient.indices().create(createIndexRequest, RequestOptions.DEFAULT);
                 log.info("The Wikimedia Index has been created!");
@@ -145,10 +145,9 @@ public class OpenSearchConsumer {
             }
 
             // we subscribe the consumer
-            consumer.subscribe(Collections.singleton("wikimedia.recentchange"));
+            consumer.subscribe(Collections.singleton("wikimedia_project"));
 
-
-            while(true) {
+            while (true) {
 
                 ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(3000));
 
@@ -163,7 +162,8 @@ public class OpenSearchConsumer {
 
                     // strategy 1
                     // define an ID using Kafka Record coordinates
-//                    String id = record.topic() + "_" + record.partition() + "_" + record.offset();
+                    // String id = record.topic() + "_" + record.partition() + "_" +
+                    // record.offset();
 
                     try {
                         // strategy 2
@@ -174,19 +174,19 @@ public class OpenSearchConsumer {
                                 .source(record.value(), XContentType.JSON)
                                 .id(id);
 
-//                        IndexResponse response = openSearchClient.index(indexRequest, RequestOptions.DEFAULT);
+                        // IndexResponse response = openSearchClient.index(indexRequest,
+                        // RequestOptions.DEFAULT);
 
                         bulkRequest.add(indexRequest);
 
-//                        log.info(response.getId());
-                    } catch (Exception e){
+                        // log.info(response.getId());
+                    } catch (Exception e) {
 
                     }
 
                 }
 
-
-                if (bulkRequest.numberOfActions() > 0){
+                if (bulkRequest.numberOfActions() > 0) {
                     BulkResponse bulkResponse = openSearchClient.bulk(bulkRequest, RequestOptions.DEFAULT);
                     log.info("Inserted " + bulkResponse.getItems().length + " record(s).");
 
@@ -201,11 +201,7 @@ public class OpenSearchConsumer {
                     log.info("Offsets have been committed!");
                 }
 
-
-
-
             }
-
 
         } catch (WakeupException e) {
             log.info("Consumer is starting to shut down");
